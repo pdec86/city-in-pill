@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "v_event_person")
-public class EventPerson {
+public class EventPersonUi {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,11 +34,11 @@ public class EventPerson {
     @JoinColumn(name = "event_id")
     private EventUi event;
 
-    protected EventPerson() {
+    protected EventPersonUi() {
     }
 
-    public EventPerson(@NonNull String firstName, @Nullable String lastName, @Nullable String phone,
-                       @Nullable String email, EventUi event) {
+    public EventPersonUi(@NonNull String firstName, @Nullable String lastName, @Nullable String phone,
+                         @Nullable String email, EventUi event) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phone = phone;

@@ -49,9 +49,9 @@ public class EventUi {
     private String ownerEmail;
 
     @NonNull
-    @OneToMany(targetEntity = EventPerson.class, mappedBy = "event", fetch = FetchType.LAZY,
+    @OneToMany(targetEntity = EventPersonUi.class, mappedBy = "event", fetch = FetchType.LAZY,
             cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<EventPerson> persons = new HashSet<>();
+    private Set<EventPersonUi> persons = new HashSet<>();
 
     public EventUi() {
     }
@@ -110,15 +110,15 @@ public class EventUi {
     }
 
     @NonNull
-    public Set<EventPerson> getPersons() {
+    public Set<EventPersonUi> getPersons() {
         return persons;
     }
 
-    public void addPerson(@NonNull EventPerson person) {
+    public void addPerson(@NonNull EventPersonUi person) {
         this.persons.add(person);
     }
 
-    public void removePerson(@NonNull EventPerson person) {
+    public void removePerson(@NonNull EventPersonUi person) {
         this.persons.remove(person);
     }
 

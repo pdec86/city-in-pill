@@ -6,7 +6,7 @@ import pl.pdec.city.events.domain.model.Event;
 import pl.pdec.city.events.domain.model.event.AbstractEvent;
 import pl.pdec.city.events.domain.repository.EventSourceRepository;
 import pl.pdec.city.events.domain.repository.EventUiRepository;
-import pl.pdec.city.events.infrastructure.ui.payload.EventPerson;
+import pl.pdec.city.events.infrastructure.ui.payload.EventPersonUi;
 import pl.pdec.city.events.infrastructure.ui.payload.EventUi;
 
 @Service
@@ -37,7 +37,7 @@ public class EventGateway {
                 event.getOwner().getContact() != null ? event.getOwner().getContact().getEmail() : null);
 
         event.getPersons().forEach(eventPerson -> eventUi.addPerson(
-                new EventPerson(eventPerson.getFirstName(), eventPerson.getLastName(),
+                new EventPersonUi(eventPerson.getFirstName(), eventPerson.getLastName(),
                         eventPerson.getContact() != null ? eventPerson.getContact().getPhone() : null,
                         eventPerson.getContact() != null ? eventPerson.getContact().getEmail() : null,
                         eventUi)));
