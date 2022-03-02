@@ -9,12 +9,16 @@ import pl.pdec.city.events.domain.model.vo.Contact;
 import pl.pdec.city.events.domain.model.vo.EventPerson;
 import pl.pdec.city.events.infrastructure.utils.EventGateway;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 public class Event {
 
+    @NonNull
     private List<AbstractEvent> eventList = new ArrayList<>();
 
+    @NonNull
     private UUID id;
 
     @NonNull
@@ -30,15 +34,21 @@ public class Event {
     private EventPerson owner;
 
     @NonNull
+    private BigDecimal totalPrice;
+
+    @NonNull
     private Set<EventPerson> persons = new HashSet<>();
 
     public Event() {
+        this.id = UUID.randomUUID();
         this.name = "";
         this.startDateTime = Calendar.getInstance(Locale.getDefault());
         this.endDateTime = Calendar.getInstance(Locale.getDefault());
         this.owner = new EventPerson("", "", null);
+        this.totalPrice = new BigDecimal(0);
     }
 
+    @NonNull
     public UUID getId() {
         return id;
     }
@@ -61,6 +71,16 @@ public class Event {
     @NonNull
     public EventPerson getOwner() {
         return owner;
+    }
+
+    @NonNull
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
+    }
+
+    @NonNull
+    public BigDecimal getPricePerPerson() {
+        return totalPrice.divide(new BigDecimal(1 + persons.size()), 2, RoundingMode.HALF_UP);
     }
 
     @NonNull
@@ -130,6 +150,7 @@ public class Event {
 
         Contact contact = new Contact(eventCreated.getOwnerPhone(), eventCreated.getOwnerEmail());
         this.owner = new EventPerson(eventCreated.getOwnerFirstName(), eventCreated.getOwnerLastName(), contact);
+        this.totalPrice = eventCreated.getTotalPrice();
     }
 
     private void processAddPerson(PersonAdded personAdded) {

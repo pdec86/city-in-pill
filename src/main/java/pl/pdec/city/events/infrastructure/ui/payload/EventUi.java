@@ -4,6 +4,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
@@ -47,6 +48,10 @@ public class EventUi {
     @Nullable
     @Column(name = "owner_email")
     private String ownerEmail;
+
+    @NonNull
+    @Column(name = "total_price")
+    private BigDecimal totalPrice;
 
     @NonNull
     @OneToMany(targetEntity = EventPersonUi.class, mappedBy = "event", fetch = FetchType.LAZY,

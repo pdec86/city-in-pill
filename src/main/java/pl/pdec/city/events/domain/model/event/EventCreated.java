@@ -8,6 +8,7 @@ import pl.pdec.city.events.domain.model.Event;
 import pl.pdec.city.events.infrastructure.model.EventSource;
 import pl.pdec.city.utils.CityDebugger;
 
+import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.UUID;
@@ -19,6 +20,12 @@ public class EventCreated extends AbstractEvent {
 
     @NonNull
     private final String name;
+
+    @NonNull
+    private final Calendar startDateTime;
+
+    @NonNull
+    private final Calendar endDateTime;
 
     @NonNull
     private final String ownerFirstName;
@@ -33,22 +40,20 @@ public class EventCreated extends AbstractEvent {
     private final String ownerEmail;
 
     @NonNull
-    private final Calendar startDateTime;
+    private final BigDecimal totalPrice;
 
-    @NonNull
-    private final Calendar endDateTime;
-
-    public EventCreated(@NonNull UUID id, @NonNull String name, @NonNull String ownerFirstName, @Nullable String ownerLastName,
-                        @Nullable String ownerPhone, @Nullable String ownerEmail, @NonNull Calendar startDateTime,
-                        @NonNull Calendar endDateTime) {
+    public EventCreated(@NonNull UUID id, @NonNull String name, @NonNull Calendar startDateTime,
+                        @NonNull Calendar endDateTime, @NonNull String ownerFirstName, @Nullable String ownerLastName,
+                        @Nullable String ownerPhone, @Nullable String ownerEmail, @NonNull BigDecimal totalPrice) {
         this.id = id;
         this.name = name;
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
         this.ownerFirstName = ownerFirstName;
         this.ownerLastName = ownerLastName;
         this.ownerPhone = ownerPhone;
         this.ownerEmail = ownerEmail;
-        this.startDateTime = startDateTime;
-        this.endDateTime = endDateTime;
+        this.totalPrice = totalPrice;
     }
 
     @NonNull
@@ -59,6 +64,16 @@ public class EventCreated extends AbstractEvent {
     @NonNull
     public String getName() {
         return name;
+    }
+
+    @NonNull
+    public Calendar getStartDateTime() {
+        return startDateTime;
+    }
+
+    @NonNull
+    public Calendar getEndDateTime() {
+        return endDateTime;
     }
 
     @NonNull
@@ -82,13 +97,8 @@ public class EventCreated extends AbstractEvent {
     }
 
     @NonNull
-    public Calendar getStartDateTime() {
-        return startDateTime;
-    }
-
-    @NonNull
-    public Calendar getEndDateTime() {
-        return endDateTime;
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
     }
 
     public void process(Event event) {
