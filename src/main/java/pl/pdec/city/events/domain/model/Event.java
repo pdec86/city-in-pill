@@ -1,6 +1,8 @@
 package pl.pdec.city.events.domain.model;
 
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
+import pl.pdec.city.common.domain.model.User;
 import pl.pdec.city.events.domain.model.event.AbstractEvent;
 import pl.pdec.city.events.domain.model.event.EventCreated;
 import pl.pdec.city.events.domain.model.event.PersonAdded;
@@ -9,6 +11,7 @@ import pl.pdec.city.events.domain.model.vo.Contact;
 import pl.pdec.city.events.domain.model.vo.EventPerson;
 import pl.pdec.city.events.infrastructure.utils.EventGateway;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
@@ -16,7 +19,10 @@ import java.util.*;
 public class Event {
 
     @NonNull
-    private List<AbstractEvent> eventList = new ArrayList<>();
+    private final List<AbstractEvent> eventList = new ArrayList<>();
+
+    @Nullable
+    private final EventGateway eventGateway;
 
     @NonNull
     private UUID id;
@@ -31,21 +37,24 @@ public class Event {
     private Calendar endDateTime;
 
     @NonNull
-    private EventPerson owner;
+    @ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "owner_id")
+    private User owner;
 
     @NonNull
     private BigDecimal totalPrice;
 
     @NonNull
-    private Set<EventPerson> persons = new HashSet<>();
+    private final Set<EventPerson> persons = new HashSet<>();
 
-    public Event() {
-        this.id = UUID.randomUUID();
+    public Event(@Nullable UUID id, @Nullable User owner, @Nullable EventGateway eventGateway) {
+        this.eventGateway = eventGateway;
+        this.id = id != null ? id : UUID.randomUUID();
         this.name = "";
         this.startDateTime = Calendar.getInstance(Locale.getDefault());
         this.endDateTime = Calendar.getInstance(Locale.getDefault());
-        this.owner = new EventPerson("", "", null);
         this.totalPrice = new BigDecimal(0);
+        this.owner = owner != null ? owner : new User("anonymous", "empty_pass", null, new HashSet<>());
     }
 
     @NonNull
@@ -69,7 +78,7 @@ public class Event {
     }
 
     @NonNull
-    public EventPerson getOwner() {
+    public User getOwner() {
         return owner;
     }
 
@@ -105,6 +114,9 @@ public class Event {
      * @param personAdded Person to be added or replaced contact.
      */
     public void addPerson(PersonAdded personAdded) {
+        if (!id.equals(personAdded.getEventId())) {
+            throw new RuntimeException("Invalid event ID");
+        }
         record(personAdded);
     }
 
@@ -114,6 +126,9 @@ public class Event {
      * @param personRemoved Person to be removed.
      */
     public void removePerson(PersonRemoved personRemoved) {
+        if (!id.equals(personRemoved.getEventId())) {
+            throw new RuntimeException("Invalid event ID");
+        }
         record(personRemoved);
     }
 
@@ -139,7 +154,9 @@ public class Event {
             processRemovePerson(personRemoved);
         }
 
-        EventGateway.projectEvent(event, this);
+        if (eventGateway != null) {
+            eventGateway.projectEvent(event, this);
+        }
     }
 
     private void processCreateNew(EventCreated eventCreated) {
@@ -147,9 +164,7 @@ public class Event {
         this.name = eventCreated.getName();
         this.startDateTime = eventCreated.getStartDateTime();
         this.endDateTime = eventCreated.getEndDateTime();
-
-        Contact contact = new Contact(eventCreated.getOwnerPhone(), eventCreated.getOwnerEmail());
-        this.owner = new EventPerson(eventCreated.getOwnerFirstName(), eventCreated.getOwnerLastName(), contact);
+        this.owner = eventCreated.getOwner();
         this.totalPrice = eventCreated.getTotalPrice();
     }
 

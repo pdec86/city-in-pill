@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import pl.pdec.city.common.domain.model.User;
 import pl.pdec.city.events.domain.model.Event;
 import pl.pdec.city.events.infrastructure.model.EventSource;
 import pl.pdec.city.utils.CityDebugger;
@@ -16,43 +17,33 @@ import java.util.UUID;
 public class EventCreated extends AbstractEvent {
 
     @NonNull
-    private final UUID id;
+    private UUID id;
 
     @NonNull
-    private final String name;
+    private String name;
 
     @NonNull
-    private final Calendar startDateTime;
+    private Calendar startDateTime;
 
     @NonNull
-    private final Calendar endDateTime;
+    private Calendar endDateTime;
 
     @NonNull
-    private final String ownerFirstName;
-
-    @Nullable
-    private final String ownerLastName;
-
-    @Nullable
-    private final String ownerPhone;
-
-    @Nullable
-    private final String ownerEmail;
+    private User owner;
 
     @NonNull
-    private final BigDecimal totalPrice;
+    private BigDecimal totalPrice;
+
+    protected EventCreated() {
+    }
 
     public EventCreated(@NonNull UUID id, @NonNull String name, @NonNull Calendar startDateTime,
-                        @NonNull Calendar endDateTime, @NonNull String ownerFirstName, @Nullable String ownerLastName,
-                        @Nullable String ownerPhone, @Nullable String ownerEmail, @NonNull BigDecimal totalPrice) {
+                        @NonNull Calendar endDateTime, @NonNull User owner, @NonNull BigDecimal totalPrice) {
         this.id = id;
         this.name = name;
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
-        this.ownerFirstName = ownerFirstName;
-        this.ownerLastName = ownerLastName;
-        this.ownerPhone = ownerPhone;
-        this.ownerEmail = ownerEmail;
+        this.owner = owner;
         this.totalPrice = totalPrice;
     }
 
@@ -77,23 +68,8 @@ public class EventCreated extends AbstractEvent {
     }
 
     @NonNull
-    public String getOwnerFirstName() {
-        return ownerFirstName;
-    }
-
-    @Nullable
-    public String getOwnerLastName() {
-        return ownerLastName;
-    }
-
-    @Nullable
-    public String getOwnerPhone() {
-        return ownerPhone;
-    }
-
-    @Nullable
-    public String getOwnerEmail() {
-        return ownerEmail;
+    public User getOwner() {
+        return owner;
     }
 
     @NonNull

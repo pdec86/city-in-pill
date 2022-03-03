@@ -18,10 +18,13 @@ public class PersonRemoved extends AbstractEvent {
     private UUID eventId;
 
     @NonNull
-    private final String firstName;
+    private String firstName;
 
     @Nullable
-    private final String lastName;
+    private String lastName;
+
+    protected PersonRemoved() {
+    }
 
     public PersonRemoved(@NonNull UUID eventId, @NonNull String firstName, @Nullable String lastName) {
         this.eventId = eventId;

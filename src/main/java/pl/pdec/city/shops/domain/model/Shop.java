@@ -1,5 +1,7 @@
 package pl.pdec.city.shops.domain.model;
 
+import pl.pdec.city.common.domain.model.User;
+
 import javax.persistence.*;
 import java.util.Set;
 
@@ -15,11 +17,9 @@ public class Shop {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "owner_first_name")
-    private String ownerFirstName;
-
-    @Column(name = "owner_last_name")
-    private String ownerLastName;
+    @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "owner_id")
+    private User owner;
 
     @Column(name = "regon")
     private String regon;

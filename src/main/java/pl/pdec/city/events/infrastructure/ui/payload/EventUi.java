@@ -2,6 +2,7 @@ package pl.pdec.city.events.infrastructure.ui.payload;
 
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import pl.pdec.city.common.domain.model.User;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -34,20 +35,9 @@ public class EventUi {
     private Calendar endDateTime;
 
     @NonNull
-    @Column(name = "owner_first_name")
-    private String ownerFirstName;
-
-    @Nullable
-    @Column(name = "owner_last_name")
-    private String ownerLastName;
-
-    @Nullable
-    @Column(name = "owner_phone")
-    private String ownerPhone;
-
-    @Nullable
-    @Column(name = "owner_email")
-    private String ownerEmail;
+    @ManyToOne(targetEntity = User.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "owner_id")
+    private User owner;
 
     @NonNull
     @Column(name = "total_price")
@@ -62,16 +52,13 @@ public class EventUi {
     }
 
     public EventUi(@NonNull UUID id, @NonNull String name, @NonNull Calendar startDateTime, @NonNull Calendar endDateTime,
-                   @NonNull String ownerFirstName, @Nullable String ownerLastName, @Nullable String ownerPhone,
-                   @Nullable String ownerEmail) {
+                   @NonNull User owner, @NonNull BigDecimal totalPrice) {
         this.id = id;
         this.name = name;
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
-        this.ownerFirstName = ownerFirstName;
-        this.ownerLastName = ownerLastName;
-        this.ownerPhone = ownerPhone;
-        this.ownerEmail = ownerEmail;
+        this.owner = owner;
+        this.totalPrice = totalPrice;
     }
 
     @NonNull
@@ -95,23 +82,8 @@ public class EventUi {
     }
 
     @NonNull
-    public String getOwnerFirstName() {
-        return ownerFirstName;
-    }
-
-    @Nullable
-    public String getOwnerLastName() {
-        return ownerLastName;
-    }
-
-    @Nullable
-    public String getOwnerPhone() {
-        return ownerPhone;
-    }
-
-    @Nullable
-    public String getOwnerEmail() {
-        return ownerEmail;
+    public User getOwner() {
+        return owner;
     }
 
     @NonNull
@@ -129,15 +101,14 @@ public class EventUi {
 
     @Override
     public String toString() {
-        return "Event{" +
+        return "EventUi{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", startDateTime=" + startDateTime +
                 ", endDateTime=" + endDateTime +
-                ", ownerFirstName='" + ownerFirstName + '\'' +
-                ", ownerLastName='" + ownerLastName + '\'' +
-                ", ownerPhone='" + ownerPhone + '\'' +
-                ", ownerEmail='" + ownerEmail + '\'' +
+                ", owner=" + owner +
+                ", totalPrice=" + totalPrice +
+                ", persons=" + persons +
                 '}';
     }
 

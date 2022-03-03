@@ -48,6 +48,34 @@ public class EventSource {
         this.eventVersion = eventVersion;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public UUID getAggregateId() {
+        return aggregateId;
+    }
+
+    public String getEventData() {
+        return eventData;
+    }
+
+    public Class<?> getEventType() {
+        return eventType;
+    }
+
+    public String getMetadata() {
+        return metadata;
+    }
+
+    public Calendar getOccurredDatetime() {
+        return occurredDatetime;
+    }
+
+    public int getEventVersion() {
+        return eventVersion;
+    }
+
     @Converter
     public static final class UUIDConverter implements AttributeConverter<UUID, String> {
 

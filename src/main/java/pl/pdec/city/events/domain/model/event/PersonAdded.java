@@ -18,16 +18,19 @@ public class PersonAdded extends AbstractEvent {
     private UUID eventId;
 
     @NonNull
-    private final String firstName;
+    private String firstName;
 
     @Nullable
-    private final String lastName;
+    private String lastName;
 
     @Nullable
-    private final String phone;
+    private String phone;
 
     @Nullable
-    private final String email;
+    private String email;
+
+    protected PersonAdded() {
+    }
 
     public PersonAdded(@NonNull UUID eventId, @NonNull String firstName, @Nullable String lastName,
                        @Nullable String phone, @Nullable String email) {

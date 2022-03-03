@@ -13,7 +13,7 @@ public class CityInPillApplication {
         new SpringApplicationBuilder(CityInPillApplication.class).run(args);
     }
 
-    @Value("${orpDebug:false}")
+    @Value("${cityDebug:false}")
     public void setDebug(@Nullable String debug) {
         CityDebugger.getInstance().setDebug(Boolean.parseBoolean(debug));
     }

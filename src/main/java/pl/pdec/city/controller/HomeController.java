@@ -1,18 +1,24 @@
 package pl.pdec.city.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import pl.pdec.city.common.domain.model.User;
+import pl.pdec.city.common.domain.model.vo.Authority;
+import pl.pdec.city.common.domain.model.vo.UserContact;
+import pl.pdec.city.common.domain.repository.UserRepository;
 import pl.pdec.city.events.domain.model.Event;
 import pl.pdec.city.events.domain.model.event.EventCreated;
 import pl.pdec.city.events.domain.model.event.PersonAdded;
+import pl.pdec.city.events.domain.repository.EventSourceRepository;
+import pl.pdec.city.events.infrastructure.utils.EventGateway;
 
 import java.math.BigDecimal;
-import java.util.Calendar;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Controller
 public class HomeController {
@@ -35,13 +41,45 @@ public class HomeController {
 //        this.eventUiRepository = eventUiRepository;
 //    }
 
-    @GetMapping("/testsave")
-    public String testSave() {
-        Event event = new Event();
+    EventGateway eventGateway;
+    @Autowired
+    public void setEventGateway(EventGateway eventGateway) {
+        this.eventGateway = eventGateway;
+    }
+
+    private UserRepository userRepository;
+    @Autowired
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    @GetMapping("/testSaveUser")
+    public String testSave2() {
+        UserContact contact = new UserContact("Paweł", "Konopko", "512112112", "pawel@mail.com");
+
+        Set<Authority> authorities = new HashSet<>();
+        authorities.add(new Authority("ROLE_USER"));
+        authorities.add(new Authority("ROLE_VIEWER"));
+
+        User user = new User("pablo", passwordEncoder.encode("pass"), contact, authorities);
+        userRepository.saveAndFlush(user);
+
+        return "forward:/ag/index.html";
+    }
+
+    @GetMapping("/testSaveEvent")
+    public String testSave1() {
+        User userPablo = userRepository.findByUsername("pablo");
+        Event event = new Event(null, userPablo, eventGateway);
         EventCreated eventCreated = new EventCreated(UUID.randomUUID(), "Some tmp",
                 Calendar.getInstance(Locale.getDefault()), Calendar.getInstance(Locale.getDefault()),
-                "Przemyslavo", "Niebieski", "677133077",
-                "przemyslavo@mail.com", new BigDecimal("317.21"));
+                userPablo, new BigDecimal("317.21"));
         event.createNew(eventCreated);
 
         event.addPerson(new PersonAdded(event.getId(), "Pablo", "Pawo", "500100100", "pawo@mail.com"));
