@@ -3,10 +3,7 @@ package pl.pdec.city.events.domain.model;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import pl.pdec.city.common.domain.model.User;
-import pl.pdec.city.events.domain.model.event.AbstractEvent;
-import pl.pdec.city.events.domain.model.event.EventCreated;
-import pl.pdec.city.events.domain.model.event.PersonAdded;
-import pl.pdec.city.events.domain.model.event.PersonRemoved;
+import pl.pdec.city.events.domain.model.event.*;
 import pl.pdec.city.events.domain.model.vo.Contact;
 import pl.pdec.city.events.domain.model.vo.EventPerson;
 import pl.pdec.city.events.infrastructure.utils.EventGateway;
@@ -35,6 +32,9 @@ public class Event {
 
     @NonNull
     private Calendar endDateTime;
+
+    @NonNull
+    private boolean isDone = false;
 
     @NonNull
     @ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -133,6 +133,17 @@ public class Event {
     }
 
     /**
+     * Mark event as done (or revert to un-done state).
+     * @param eventDone If event should be marked as done or not done.
+     */
+    public void markAsDone(EventDone eventDone) {
+        if (!id.equals(eventDone.getEventId())) {
+            throw new RuntimeException("Invalid event ID");
+        }
+        record(eventDone);
+    }
+
+    /**
      * Get event list, which occurred on this object.
      * @return Processed event list.
      */
@@ -152,6 +163,8 @@ public class Event {
             processAddPerson(personAdded);
         } else if (event instanceof PersonRemoved personRemoved) {
             processRemovePerson(personRemoved);
+        } else if (event instanceof EventDone eventDone) {
+            processEventDone(eventDone);
         }
 
         if (eventGateway != null) {
@@ -183,5 +196,9 @@ public class Event {
     private void processRemovePerson(PersonRemoved personRemoved) {
         EventPerson person = new EventPerson(personRemoved.getFirstName(), personRemoved.getLastName(), null);
         persons.remove(person);
+    }
+
+    private void processEventDone(EventDone eventDone) {
+        this.isDone = eventDone.isDone();
     }
 }
