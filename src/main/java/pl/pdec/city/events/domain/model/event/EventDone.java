@@ -1,32 +1,23 @@
 package pl.pdec.city.events.domain.model.event;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.lang.NonNull;
 import pl.pdec.city.events.domain.model.Event;
 import pl.pdec.city.events.infrastructure.model.EventSource;
 import pl.pdec.city.utils.CityDebugger;
 
-import java.util.Calendar;
-import java.util.Locale;
-import java.util.UUID;
-
 public class EventDone extends AbstractEvent {
 
-    @NonNull
-    private UUID eventId;
-
-    @NonNull
     private boolean isDone;
 
-    public EventDone(@NonNull UUID eventId, boolean isDone) {
-        this.eventId = eventId;
-        this.isDone = isDone;
+    protected EventDone() {
     }
 
-    @NonNull
-    public UUID getEventId() {
-        return eventId;
+    public EventDone(boolean isDone) {
+        super();
+        this.isDone = isDone;
     }
 
     public boolean isDone() {
@@ -39,13 +30,14 @@ public class EventDone extends AbstractEvent {
     }
 
     @Override
-    public EventSource toEventSource() {
+    public EventSource toEventSource(Event event) {
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
+        objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         try {
             String eventAsJson = objectMapper.writeValueAsString(this);
 
-            return new EventSource(this.eventId, eventAsJson, this.getClass(), null,
-                    Calendar.getInstance(Locale.getDefault()), 1);
+            return new EventSource(event.getId(), eventAsJson, this.getClass(), null, this.occurredOn, 1);
         } catch (JsonProcessingException ex) {
             CityDebugger.getInstance().debugError(ex);
         }

@@ -1,7 +1,6 @@
 package pl.pdec.city.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +13,6 @@ import pl.pdec.city.common.domain.repository.UserRepository;
 import pl.pdec.city.events.domain.model.Event;
 import pl.pdec.city.events.domain.model.event.EventCreated;
 import pl.pdec.city.events.domain.model.event.PersonAdded;
-import pl.pdec.city.events.domain.repository.EventSourceRepository;
 import pl.pdec.city.events.infrastructure.utils.EventGateway;
 
 import java.math.BigDecimal;
@@ -75,14 +73,15 @@ public class HomeController {
 
     @GetMapping("/testSaveEvent")
     public String testSave1() {
+        Event event = new Event(null, eventGateway);
+
         User userPablo = userRepository.findByUsername("pablo");
-        Event event = new Event(null, userPablo, eventGateway);
         EventCreated eventCreated = new EventCreated(UUID.randomUUID(), "Some tmp",
                 Calendar.getInstance(Locale.getDefault()), Calendar.getInstance(Locale.getDefault()),
                 userPablo, new BigDecimal("317.21"));
         event.createNew(eventCreated);
 
-        event.addPerson(new PersonAdded(event.getId(), "Pablo", "Pawo", "500100100", "pawo@mail.com"));
+        event.addPerson(new PersonAdded("Pablo", "Pawo", "500100100", "pawo@mail.com"));
 
         return "forward:/ag/index.html";
     }

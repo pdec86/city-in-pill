@@ -1,7 +1,6 @@
 package pl.pdec.city.events.infrastructure.ui.payload;
 
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 import pl.pdec.city.common.domain.model.User;
 
 import javax.persistence.*;
@@ -46,7 +45,7 @@ public class EventUi {
     @NonNull
     @OneToMany(targetEntity = EventPersonUi.class, mappedBy = "event", fetch = FetchType.LAZY,
             cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<EventPersonUi> persons = new HashSet<>();
+    private final Set<EventPersonUi> persons = new HashSet<>();
 
     public EventUi() {
     }

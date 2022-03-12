@@ -1,5 +1,7 @@
 package pl.pdec.city.events.infrastructure.utils;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +16,6 @@ import pl.pdec.city.events.infrastructure.ui.payload.EventPersonUi;
 import pl.pdec.city.events.infrastructure.ui.payload.EventUi;
 import pl.pdec.city.utils.CityDebugger;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,10 +36,12 @@ public class EventGateway {
     }
 
     public Event restoreEvent(UUID id) {
-        Event event = new Event(id, null,null);
+        Event event = new Event(id);
         List<EventSource> eventSources = eventSourceRepository.findAllById(event.getId());
 
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
+        objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         eventSources.forEach(eventSource -> {
             try {
                 EventProcess eventProcess = (EventProcess)
@@ -52,8 +55,8 @@ public class EventGateway {
         return event;
     }
 
-    public void projectEvent(AbstractEvent domainEvent, Event event) {
-        this.eventSourceRepository.saveAndFlush(domainEvent.toEventSource());
+    public void projectEvent(AbstractEvent aEvent, Event event) {
+        this.eventSourceRepository.saveAndFlush(aEvent.toEventSource(event));
         projectEvent(event);
     }
 

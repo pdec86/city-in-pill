@@ -8,7 +8,10 @@ import pl.pdec.city.events.domain.model.vo.Contact;
 import pl.pdec.city.events.domain.model.vo.EventPerson;
 import pl.pdec.city.events.infrastructure.utils.EventGateway;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
@@ -33,7 +36,6 @@ public class Event {
     @NonNull
     private Calendar endDateTime;
 
-    @NonNull
     private boolean isDone = false;
 
     @NonNull
@@ -47,14 +49,18 @@ public class Event {
     @NonNull
     private final Set<EventPerson> persons = new HashSet<>();
 
-    public Event(@Nullable UUID id, @Nullable User owner, @Nullable EventGateway eventGateway) {
+    public Event(@Nullable UUID id) {
+        this(id, null);
+    }
+
+    public Event(@Nullable UUID id, @Nullable EventGateway eventGateway) {
         this.eventGateway = eventGateway;
         this.id = id != null ? id : UUID.randomUUID();
         this.name = "";
         this.startDateTime = Calendar.getInstance(Locale.getDefault());
         this.endDateTime = Calendar.getInstance(Locale.getDefault());
         this.totalPrice = new BigDecimal(0);
-        this.owner = owner != null ? owner : new User("anonymous", "empty_pass", null, new HashSet<>());
+        this.owner = new User("anonymous", "empty_pass", null, new HashSet<>());
     }
 
     @NonNull
@@ -92,6 +98,10 @@ public class Event {
         return totalPrice.divide(new BigDecimal(1 + persons.size()), 2, RoundingMode.HALF_UP);
     }
 
+    public boolean isDone() {
+        return isDone;
+    }
+
     @NonNull
     public Set<EventPerson> getPersons() {
         return persons;
@@ -106,6 +116,13 @@ public class Event {
             throw new RuntimeException("Event name cannot be empty.");
         }
 
+        this.id = eventCreated.getEventId();
+        this.name = eventCreated.getName();
+        this.startDateTime = eventCreated.getStartDateTime();
+        this.endDateTime = eventCreated.getEndDateTime();
+        this.owner = eventCreated.getOwner();
+        this.totalPrice = eventCreated.getTotalPrice();
+
         this.record(eventCreated);
     }
 
@@ -114,9 +131,16 @@ public class Event {
      * @param personAdded Person to be added or replaced contact.
      */
     public void addPerson(PersonAdded personAdded) {
-        if (!id.equals(personAdded.getEventId())) {
-            throw new RuntimeException("Invalid event ID");
+        Contact contact = new Contact(personAdded.getPhone(), personAdded.getEmail());
+        EventPerson person = new EventPerson(personAdded.getFirstName(), personAdded.getLastName(), contact);
+
+        if (persons.contains(person)) {
+            persons.remove(person);
+            persons.add(person);
+        } else {
+            persons.add(person);
         }
+
         record(personAdded);
     }
 
@@ -126,9 +150,9 @@ public class Event {
      * @param personRemoved Person to be removed.
      */
     public void removePerson(PersonRemoved personRemoved) {
-        if (!id.equals(personRemoved.getEventId())) {
-            throw new RuntimeException("Invalid event ID");
-        }
+        EventPerson person = new EventPerson(personRemoved.getFirstName(), personRemoved.getLastName(), null);
+        persons.remove(person);
+
         record(personRemoved);
     }
 
@@ -137,9 +161,8 @@ public class Event {
      * @param eventDone If event should be marked as done or not done.
      */
     public void markAsDone(EventDone eventDone) {
-        if (!id.equals(eventDone.getEventId())) {
-            throw new RuntimeException("Invalid event ID");
-        }
+        this.isDone = eventDone.isDone();
+
         record(eventDone);
     }
 
@@ -151,54 +174,11 @@ public class Event {
         return Collections.unmodifiableList(this.eventList);
     }
 
-    private void record(AbstractEvent event) {
-        this.eventList.add(event);
-        apply(event);
-    }
-
-    private void apply(AbstractEvent event) {
-        if (event instanceof EventCreated eventCreated) {
-            processCreateNew(eventCreated);
-        } else if (event instanceof PersonAdded personAdded) {
-            processAddPerson(personAdded);
-        } else if (event instanceof PersonRemoved personRemoved) {
-            processRemovePerson(personRemoved);
-        } else if (event instanceof EventDone eventDone) {
-            processEventDone(eventDone);
-        }
+    private void record(AbstractEvent aEvent) {
+        this.eventList.add(aEvent);
 
         if (eventGateway != null) {
-            eventGateway.projectEvent(event, this);
+            eventGateway.projectEvent(aEvent, this);
         }
-    }
-
-    private void processCreateNew(EventCreated eventCreated) {
-        this.id = eventCreated.getId();
-        this.name = eventCreated.getName();
-        this.startDateTime = eventCreated.getStartDateTime();
-        this.endDateTime = eventCreated.getEndDateTime();
-        this.owner = eventCreated.getOwner();
-        this.totalPrice = eventCreated.getTotalPrice();
-    }
-
-    private void processAddPerson(PersonAdded personAdded) {
-        Contact contact = new Contact(personAdded.getPhone(), personAdded.getEmail());
-        EventPerson person = new EventPerson(personAdded.getFirstName(), personAdded.getLastName(), contact);
-
-        if (persons.contains(person)) {
-            persons.remove(person);
-            persons.add(person);
-        } else {
-            persons.add(person);
-        }
-    }
-
-    private void processRemovePerson(PersonRemoved personRemoved) {
-        EventPerson person = new EventPerson(personRemoved.getFirstName(), personRemoved.getLastName(), null);
-        persons.remove(person);
-    }
-
-    private void processEventDone(EventDone eventDone) {
-        this.isDone = eventDone.isDone();
     }
 }
