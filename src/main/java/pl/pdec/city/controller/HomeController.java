@@ -76,7 +76,7 @@ public class HomeController {
         Event event = new Event(null, eventGateway);
 
         User userPablo = userRepository.findByUsername("pablo");
-        EventCreated eventCreated = new EventCreated(UUID.randomUUID(), "Some tmp",
+        EventCreated eventCreated = new EventCreated(UUID.randomUUID(), "A simple event",
                 Calendar.getInstance(Locale.getDefault()), Calendar.getInstance(Locale.getDefault()),
                 userPablo, new BigDecimal("317.21"));
         event.createNew(eventCreated);

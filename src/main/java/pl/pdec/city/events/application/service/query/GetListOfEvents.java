@@ -1,6 +1,7 @@
 package pl.pdec.city.events.application.service.query;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import pl.pdec.city.events.domain.repository.EventUiRepository;
 import pl.pdec.city.events.infrastructure.ui.payload.EventUi;
@@ -18,6 +19,6 @@ public class GetListOfEvents {
     }
 
     public List<EventUi> execute() {
-         return eventUiRepository.findAll();
+         return eventUiRepository.findAll(Sort.by(Sort.Order.asc("name")));
     }
 }

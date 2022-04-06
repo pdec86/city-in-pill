@@ -1,5 +1,6 @@
 package pl.pdec.city.events.infrastructure.ui.payload;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.lang.NonNull;
 import pl.pdec.city.common.domain.model.User;
 
@@ -33,6 +34,7 @@ public class EventUi {
     @Column(name = "end_date_time")
     private Calendar endDateTime;
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @NonNull
     @ManyToOne(targetEntity = User.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "owner_id")

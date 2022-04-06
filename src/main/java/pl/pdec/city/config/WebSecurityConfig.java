@@ -25,7 +25,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests(authorizeRequests -> authorizeRequests
                         .mvcMatchers("/", "/logout", "/ag/**").permitAll()
                         .mvcMatchers("/actuator/health", "/favicon.ico").permitAll()
-//                        .mvcMatchers("/testget", "/api/**").permitAll()
+                        .mvcMatchers("/testget", "/api/**").permitAll()
                         .anyRequest().authenticated())
                 .httpBasic().and()
 //                .formLogin().loginPage("/login").loginProcessingUrl("/api/ag_login").permitAll().and()

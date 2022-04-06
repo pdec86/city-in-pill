@@ -3,11 +3,12 @@ package pl.pdec.city;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.lang.Nullable;
 import pl.pdec.city.utils.CityDebugger;
 
 @SpringBootApplication
-public class CityInPillApplication {
+public class CityInPillApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
         new SpringApplicationBuilder(CityInPillApplication.class).run(args);
