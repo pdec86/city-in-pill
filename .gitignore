@@ -5,7 +5,8 @@ target/
 !**/src/test/**/target/
 out/
 frontend/*
-!frontend/orp_app
+!frontend/city_in_pill
+city-backend/src/main/resources/public/ag
 
 ### STS ###
 .apt_generated
