@@ -6,6 +6,7 @@ target/
 out/
 frontend/*
 !frontend/city_in_pill
+city-backend/src/main/resources/public/ag
 
 ### STS ###
 .apt_generated
